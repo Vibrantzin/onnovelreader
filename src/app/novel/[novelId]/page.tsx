@@ -68,6 +68,13 @@ export default function NovelPage() {
       return
     }
 
+    // Block access to unpublished novels unless you are the author
+    if (!novelData.is_published && novelData.author_id !== session?.user?.id) {
+      setFetchError('This novel is not available.')
+      setLoading(false)
+      return
+    }
+
     const { data: authorData } = await supabase
       .from('users')
       .select('username')
@@ -113,8 +120,13 @@ export default function NovelPage() {
       }
     }
 
-    await supabase.from('novel_views').insert([{ novel_id: novelId, user_id: session?.user?.id || null }])
-    await supabase.rpc('check_and_release_milestones', { p_novel_id: novelId })
+    // Only log a view once per browser session per novel — prevents refresh farming
+    const viewKey = `viewed_novel_${novelId}`
+    if (!sessionStorage.getItem(viewKey)) {
+      sessionStorage.setItem(viewKey, '1')
+      await supabase.from('novel_views').insert([{ novel_id: novelId, user_id: session?.user?.id || null }])
+      await supabase.rpc('check_and_release_milestones', { p_novel_id: novelId })
+    }
 
     setLoading(false)
   }

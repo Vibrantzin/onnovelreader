@@ -5,18 +5,18 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 
 // Replace this with your own Supabase user ID to restrict access
 // Find it in Supabase → Authentication → Users → your account
-const ADMIN_USER_ID = 'YOUR_USER_ID_HERE'
+const ADMIN_USER_ID = '489099a5-b55a-4a0c-ab5c-ef788a43c764'
 
 export default function AdminFeatured() {
   const router = useRouter()
   const [allNovels, setAllNovels] = useState<any[]>([])
   const [featured, setFeatured] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [notAuthorized, setNotAuthorized] = useState(false)
   const [search, setSearch] = useState('')
   const [error, setError] = useState('')
 
@@ -27,7 +27,8 @@ export default function AdminFeatured() {
   const checkAdminAndFetch = async () => {
     const { data: { session } } = await supabase.auth.getSession()
     if (!session || session.user.id !== ADMIN_USER_ID) {
-      notFound()
+      setNotAuthorized(true)
+      setLoading(false)
       return
     }
 
@@ -50,7 +51,22 @@ export default function AdminFeatured() {
       novel_id: novelId,
       display_order: featured.length,
     }])
-    if (error) { setError(error.message) } else { await checkAdminAndFetch() }
+    if (error) {
+      setError(error.message)
+    } else {
+      // Notify the author their novel was featured
+      const novel = allNovels.find((n) => n.id === novelId)
+      if (novel) {
+        await supabase.rpc('send_notification', {
+          p_user_id: novel.author_id,
+          p_type: 'chosen_pick',
+          p_title: `"${novel.title}" is now a Chosen Pick!`,
+          p_message: `Congratulations! Your novel "${novel.title}" has been selected as a Chosen Pick and is now featured on the browse page.`,
+          p_novel_id: novelId,
+        })
+      }
+      await checkAdminAndFetch()
+    }
   }
 
   const handleRemove = async (id: string) => {
@@ -77,6 +93,14 @@ export default function AdminFeatured() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-zinc-50">
       <p className="text-zinc-400 text-sm">Loading...</p>
+    </div>
+  )
+
+  if (notAuthorized) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white text-zinc-900 font-sans gap-4">
+      <h1 className="text-6xl font-bold text-zinc-200">404</h1>
+      <p className="text-zinc-500 text-sm">This page could not be found.</p>
+      <a href="/" className="text-sm text-zinc-900 underline">Go home</a>
     </div>
   )
 

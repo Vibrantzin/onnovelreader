@@ -31,6 +31,7 @@ export default function NovelDetail() {
   const [chapterTitle, setChapterTitle] = useState('')
   const [error, setError] = useState('')
   const [deletingNovel, setDeletingNovel] = useState(false)
+  const [togglingPublish, setTogglingPublish] = useState(false)
 
   // Genres
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
@@ -97,6 +98,22 @@ export default function NovelDetail() {
       setShowGenrePicker(false)
     }
     setSavingGenres(false)
+  }
+
+  const handleTogglePublish = async () => {
+    setTogglingPublish(true)
+    const newStatus = !novel.is_published
+    const { error } = await supabase
+      .from('novels')
+      .update({ is_published: newStatus })
+      .eq('id', novelId)
+
+    if (error) {
+      setError('Failed to update publish status: ' + error.message)
+    } else {
+      setNovel((n: any) => ({ ...n, is_published: newStatus }))
+    }
+    setTogglingPublish(false)
   }
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -233,6 +250,17 @@ export default function NovelDetail() {
             className="text-sm font-medium text-red-400 hover:text-red-600 transition-colors disabled:opacity-50"
           >
             {deletingNovel ? 'Deleting...' : 'Delete Novel'}
+          </button>
+          <button
+            onClick={handleTogglePublish}
+            disabled={togglingPublish}
+            className={`text-sm font-medium px-4 py-1.5 rounded transition-colors disabled:opacity-50 ${
+              novel?.is_published
+                ? 'bg-green-100 text-green-700 hover:bg-green-200'
+                : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+            }`}
+          >
+            {togglingPublish ? '...' : novel?.is_published ? '● Published' : '○ Unpublished'}
           </button>
           <Link
             href={`/dashboard/${novelId}/releases`}

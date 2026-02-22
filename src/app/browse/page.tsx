@@ -107,8 +107,7 @@ export default function Browse() {
       supabase
         .from('novels')
         .select('*')
-        .eq('is_completed', false)
-        .or('is_completed.eq.true,is_completed.eq.false'),
+        .eq('is_published', true),
       supabase
         .from('featured_novels')
         .select('novel_id, display_order')
