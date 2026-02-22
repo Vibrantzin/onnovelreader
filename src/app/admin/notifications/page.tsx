@@ -1,13 +1,15 @@
 // src/app/admin/notifications/page.tsx
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 
-const ADMIN_USER_ID = '489099a5-b55a-4a0c-ab5c-ef788a43c764'
+const ADMIN_USER_ID = 'YOUR_USER_ID_HERE'
 
 type NotifType = 'admin_warning' | 'copyright_notice' | 'chosen_pick'
 

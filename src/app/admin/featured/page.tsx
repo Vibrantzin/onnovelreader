@@ -1,6 +1,8 @@
 // src/app/admin/featured/page.tsx
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -9,7 +11,7 @@ import Navbar from '@/components/Navbar'
 
 // Replace this with your own Supabase user ID to restrict access
 // Find it in Supabase → Authentication → Users → your account
-const ADMIN_USER_ID = '489099a5-b55a-4a0c-ab5c-ef788a43c764'
+const ADMIN_USER_ID = 'YOUR_USER_ID_HERE'
 
 export default function AdminFeatured() {
   const router = useRouter()
