@@ -1,6 +1,7 @@
 // src/app/admin/takedown/page.tsx
 'use client'
 
+
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
@@ -11,6 +12,8 @@ import Link from 'next/link'
 const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_USER_ID || ''
 
 export default function AdminTakedown() {
+
+  useEffect(() => { document.title = 'Admin — Content Moderation | Novel Reader' }, [])
   const [novels, setNovels] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [notAuthorized, setNotAuthorized] = useState(false)

@@ -1,6 +1,7 @@
 // src/app/admin/featured/page.tsx
 'use client'
 
+
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
@@ -14,6 +15,8 @@ import Navbar from '@/components/Navbar'
 const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_USER_ID || ''
 
 export default function AdminFeatured() {
+
+  useEffect(() => { document.title = 'Admin — Chosen Pick | Novel Reader' }, [])
   const router = useRouter()
   const [allNovels, setAllNovels] = useState<any[]>([])
   const [featured, setFeatured] = useState<any[]>([])

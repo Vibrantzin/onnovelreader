@@ -24,7 +24,6 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
           ★
         </button>
       ))}
-      <Footer />
     </div>
   )
 }
@@ -109,6 +108,7 @@ export default function NovelPage() {
     ])
 
     setNovel(novel)
+    document.title = `${novel.title} | Novel Reader`
     setChapters(chapters || [])
     setReviews(reviews || [])
 
@@ -126,7 +126,7 @@ export default function NovelPage() {
         .select('novel_id')
         .eq('novel_id', novelId)
         .eq('user_id', session.user.id)
-        .single()
+        .maybeSingle()
       setIsFollowing(!!followData)
 
       const existing = (reviews || []).find((r: any) => r.user_id === session.user.id)
@@ -381,6 +381,7 @@ export default function NovelPage() {
           )}
         </section>
       </main>
+      <Footer />
     </div>
   )
 }

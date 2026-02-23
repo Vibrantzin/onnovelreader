@@ -1,6 +1,7 @@
 // src/app/login/page.tsx
 'use client'
 
+
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -8,6 +9,8 @@ import { useRouter } from 'next/navigation'
 type View = 'login' | 'signup' | 'forgot'
 
 export default function Login() {
+
+  useEffect(() => { document.title = 'Sign In | Novel Reader' }, [])
   const [view, setView] = useState<View>('login')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')

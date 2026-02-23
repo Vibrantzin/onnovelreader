@@ -14,6 +14,8 @@ const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_USER_ID || ''
 type NotifType = 'admin_warning' | 'copyright_notice' | 'chosen_pick'
 
 export default function AdminNotifications() {
+
+  useEffect(() => { document.title = 'Admin — Notifications | Novel Reader' }, [])
   const router = useRouter()
   const [users, setUsers] = useState<any[]>([])
   const [novels, setNovels] = useState<any[]>([])
@@ -101,7 +103,7 @@ export default function AdminNotifications() {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session?.access_token}`,
+              'Authorization': `Bearer ${supabaseAnonKey}`,
               'apikey': supabaseAnonKey!,
             },
             body: JSON.stringify({ user_id: targetUserId, title, message }),

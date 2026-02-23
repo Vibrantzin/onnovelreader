@@ -1,6 +1,7 @@
 // src/app/page.tsx
 'use client'
 
+
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
@@ -8,6 +9,8 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 
 export default function Home() {
+
+  useEffect(() => { document.title = 'Novel Reader — Write. Publish. Connect.' }, [])
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
   useEffect(() => {

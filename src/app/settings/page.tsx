@@ -1,12 +1,15 @@
 // src/app/settings/page.tsx
 'use client'
 
+
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function Settings() {
+
+  useEffect(() => { document.title = 'Account Settings | Novel Reader' }, [])
   const router = useRouter()
   const [session, setSession] = useState<any>(null)
   const [loading, setLoading] = useState(true)

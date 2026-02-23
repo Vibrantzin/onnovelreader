@@ -1,6 +1,7 @@
 // src/app/admin/accounts/page.tsx
 'use client'
 
+
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
@@ -27,6 +28,8 @@ const ACTIONS = [
 ]
 
 export default function AdminAccounts() {
+
+  useEffect(() => { document.title = 'Admin — Account Moderation | Novel Reader' }, [])
   const [users, setUsers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [notAuthorized, setNotAuthorized] = useState(false)

@@ -1,5 +1,6 @@
 'use client'
 
+
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter } from 'next/navigation'
@@ -7,6 +8,8 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 
 export default function Dashboard() {
+
+  useEffect(() => { document.title = 'Your Library | Novel Reader' }, [])
   const [novels, setNovels] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)

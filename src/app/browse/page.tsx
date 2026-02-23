@@ -1,6 +1,7 @@
 // src/app/browse/page.tsx
 'use client'
 
+
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
@@ -86,6 +87,8 @@ function Section({ title, subtitle, novels }: { title: string; subtitle: string;
 }
 
 export default function Browse() {
+
+  useEffect(() => { document.title = 'Browse Novels | Novel Reader' }, [])
   const [allNovels, setAllNovels] = useState<any[]>([])
   const [featured, setFeatured] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
