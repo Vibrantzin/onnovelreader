@@ -7,6 +7,8 @@ import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 
+const NSFW_GENRES = ['Adult', 'Ecchi', 'Harem', 'Mature', 'Smut', 'Yaoi', 'Yuri', 'Shoujo Ai', 'Shounen Ai', 'LGBT+', 'Gender Bender']
+
 const GENRES = [
   'Action', 'Adult', 'Adventure', 'Anime & Comics', 'Comedy', 'Drama',
   'Eastern', 'Ecchi', 'Fan-fiction', 'Fantasy', 'Game', 'Gender Bender',
@@ -39,6 +41,8 @@ export default function NovelDetail() {
   const [savingGenres, setSavingGenres] = useState(false)
   const [ageRating, setAgeRating] = useState('everyone')
   const [savingRating, setSavingRating] = useState(false)
+  const [userAge, setUserAge] = useState<number | null>(null)
+  const [maxAllowedRating, setMaxAllowedRating] = useState('adult')
 
   // Cover upload
   const [coverUploading, setCoverUploading] = useState(false)
@@ -63,6 +67,22 @@ export default function NovelDetail() {
     if (novelError || !novelData) {
       router.push('/dashboard')
       return
+    }
+
+    // Fetch user age to enforce writing restrictions
+    const { data: userData } = await supabase
+      .from('users')
+      .select('date_of_birth, age_verified')
+      .eq('id', session.user.id)
+      .single()
+
+    if (userData?.date_of_birth) {
+      const age = Math.floor((Date.now() - new Date(userData.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+      setUserAge(age)
+      if (age >= 18) setMaxAllowedRating('adult')
+      else if (age >= 17) setMaxAllowedRating('mature')
+      else if (age >= 13) setMaxAllowedRating('teen')
+      else setMaxAllowedRating('everyone')
     }
 
     setNovel(novelData)
@@ -120,6 +140,8 @@ export default function NovelDetail() {
   }
 
   const handleSaveAgeRating = async (rating: string) => {
+    const RATING_ORDER = ['everyone', 'teen', 'mature', 'adult']
+    if (RATING_ORDER.indexOf(rating) > RATING_ORDER.indexOf(maxAllowedRating)) return
     setSavingRating(true)
     setAgeRating(rating)
     await supabase.from('novels').update({ age_rating: rating }).eq('id', novelId)
@@ -351,10 +373,12 @@ export default function NovelDetail() {
                 <button
                   key={opt.value}
                   onClick={() => handleSaveAgeRating(opt.value)}
-                  disabled={savingRating}
+                  disabled={savingRating || ['everyone','teen','mature','adult'].indexOf(opt.value) > ['everyone','teen','mature','adult'].indexOf(maxAllowedRating)}
                   className={`text-xs px-3 py-1 rounded-full border font-medium transition-colors disabled:opacity-50 ${
                     ageRating === opt.value
                       ? 'bg-zinc-900 text-white border-zinc-900'
+                      : (['everyone','teen','mature','adult'].indexOf(opt.value) > ['everyone','teen','mature','adult'].indexOf(maxAllowedRating))
+                      ? 'bg-zinc-50 text-zinc-300 border-zinc-100 cursor-not-allowed'
                       : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400'
                   }`}
                 >
@@ -362,6 +386,12 @@ export default function NovelDetail() {
                 </button>
               ))}
             </div>
+
+            {maxAllowedRating !== 'adult' && (
+              <p className="text-xs text-amber-600 mt-2">
+                ⚠️ Some ratings are unavailable — you must be the required age to publish content at that rating.
+              </p>
+            )}
 
             {/* Genre picker panel */}
             {showGenrePicker && (

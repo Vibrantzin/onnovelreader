@@ -22,6 +22,8 @@ export default function Editor() {
 
   const [title, setTitle] = useState('')
   const [novelId, setNovelId] = useState('')
+  const [novelAgeRating, setNovelAgeRating] = useState('everyone')
+  const [userAge, setUserAge] = useState<number | null>(null)
   const [font, setFont] = useState(FONTS[0].value)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved')
   const [wordCount, setWordCount] = useState(0)
@@ -46,7 +48,7 @@ export default function Editor() {
 
       const { data, error } = await supabase
         .from('chapters')
-        .select('*, novels(author_id, id)')
+        .select('*, novels(author_id, id, age_rating)')
         .eq('id', chapterId)
         .single()
 
@@ -62,8 +64,27 @@ export default function Editor() {
         return
       }
 
-      setTitle(data.title || '')
       setNovelId(data.novels.id)
+      setNovelAgeRating(data.novels.age_rating || 'everyone')
+      setTitle(data.title || '')
+
+      // Fetch user age for writing restrictions
+      const { data: userData } = await supabase
+        .from('users')
+        .select('date_of_birth')
+        .eq('id', session.user.id)
+        .single()
+      if (userData?.date_of_birth) {
+        const age = Math.floor((Date.now() - new Date(userData.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+        setUserAge(age)
+        // Redirect if trying to edit a novel above their age rating
+        const RATING_ORDER = ['everyone', 'teen', 'mature', 'adult']
+        const maxRating = age >= 18 ? 'adult' : age >= 17 ? 'mature' : 'teen'
+        if (RATING_ORDER.indexOf(data.novels.age_rating || 'everyone') > RATING_ORDER.indexOf(maxRating)) {
+          router.push(`/dashboard/${data.novels.id}`)
+          return
+        }
+      }
       if (editorRef.current) {
         editorRef.current.innerHTML = data.content || ''
         updateWordCount(data.content || '')

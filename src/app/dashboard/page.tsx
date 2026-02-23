@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [isCreating, setIsCreating] = useState(false)
   const [accountStatus, setAccountStatus] = useState('active')
   const [statusReason, setStatusReason] = useState('')
+  const [userAge, setUserAge] = useState<number | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [title, setTitle] = useState('')
   const [synopsis, setSynopsis] = useState('')
@@ -52,6 +53,10 @@ export default function Dashboard() {
         const status = userData.account_status || 'active'
         setAccountStatus(status)
         setStatusReason(userData.status_reason || '')
+        if (userData.date_of_birth) {
+          const age = Math.floor((Date.now() - new Date(userData.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+          setUserAge(age)
+        }
 
         // Sign out suspended/banned users
         if (status === 'suspended' || status === 'permanently_banned') {
@@ -145,6 +150,11 @@ export default function Dashboard() {
         {isCreating && (
           <form onSubmit={handleCreateNovel} className="bg-white p-6 rounded border border-zinc-200 mb-8 shadow-sm">
             <h3 className="font-semibold mb-4">Start a new story</h3>
+            {userAge !== null && userAge < 18 && (
+              <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-4 text-xs text-amber-700">
+                ⚠️ As a user under 18, your novels will be limited to <strong>Teen (13+)</strong> rating or below. Adult genres and ratings will be unavailable.
+              </div>
+            )}
             <input
               type="text"
               placeholder="Novel Title"
