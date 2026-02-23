@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 
-const ADMIN_USER_ID = '489099a5-b55a-4a0c-ab5c-ef788a43c764'
+const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_USER_ID || ''
 
 type Notification = {
   id: string
@@ -155,6 +155,12 @@ export default function Navbar() {
                 </Link>
                 <Link href="/admin/notifications" className="block px-4 py-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
                   ⚠️ Send Notification
+                </Link>
+                <Link href="/admin/takedown" className="block px-4 py-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
+                  🚫 Content Moderation
+                </Link>
+                <Link href="/admin/accounts" className="block px-4 py-2.5 text-xs font-medium text-zinc-700 hover:bg-zinc-50 transition-colors">
+                  👤 Account Moderation
                 </Link>
               </div>
             </div>

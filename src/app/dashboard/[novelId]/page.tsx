@@ -37,6 +37,8 @@ export default function NovelDetail() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [showGenrePicker, setShowGenrePicker] = useState(false)
   const [savingGenres, setSavingGenres] = useState(false)
+  const [ageRating, setAgeRating] = useState('everyone')
+  const [savingRating, setSavingRating] = useState(false)
 
   // Cover upload
   const [coverUploading, setCoverUploading] = useState(false)
@@ -65,6 +67,7 @@ export default function NovelDetail() {
 
     setNovel(novelData)
     setSelectedGenres(novelData.genres || [])
+    setAgeRating(novelData.age_rating || 'everyone')
 
     const { data: chaptersData } = await supabase
       .from('chapters')
@@ -114,6 +117,14 @@ export default function NovelDetail() {
       setNovel((n: any) => ({ ...n, is_published: newStatus }))
     }
     setTogglingPublish(false)
+  }
+
+  const handleSaveAgeRating = async (rating: string) => {
+    setSavingRating(true)
+    setAgeRating(rating)
+    await supabase.from('novels').update({ age_rating: rating }).eq('id', novelId)
+    setNovel((n: any) => ({ ...n, age_rating: rating }))
+    setSavingRating(false)
   }
 
   const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -326,6 +337,30 @@ export default function NovelDetail() {
               >
                 {showGenrePicker ? 'Cancel' : '✎ Edit Genres'}
               </button>
+            </div>
+
+            {/* Age rating selector */}
+            <div className="mt-3 flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-zinc-400 font-medium">Age Rating:</span>
+              {[
+                { value: 'everyone', label: '👶 Everyone' },
+                { value: 'teen', label: '🧒 Teen (13+)' },
+                { value: 'mature', label: '🔞 Mature (17+)' },
+                { value: 'adult', label: '🔴 Adult (18+)' },
+              ].map((opt) => (
+                <button
+                  key={opt.value}
+                  onClick={() => handleSaveAgeRating(opt.value)}
+                  disabled={savingRating}
+                  className={`text-xs px-3 py-1 rounded-full border font-medium transition-colors disabled:opacity-50 ${
+                    ageRating === opt.value
+                      ? 'bg-zinc-900 text-white border-zinc-900'
+                      : 'bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
             </div>
 
             {/* Genre picker panel */}

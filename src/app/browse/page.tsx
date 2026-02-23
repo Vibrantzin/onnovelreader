@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import Footer from '@/components/Footer'
+import { isNSFW } from '@/components/AgeGate'
 
 const GENRES = [
   'Action', 'Adult', 'Adventure', 'Anime & Comics', 'Comedy', 'Drama',
@@ -87,9 +89,12 @@ export default function Browse() {
   const [allNovels, setAllNovels] = useState<any[]>([])
   const [featured, setFeatured] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [ageVerified, setAgeVerified] = useState(false)
+  const [userAgeRating, setUserAgeRating] = useState<string>('everyone')
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [featuredIndex, setFeaturedIndex] = useState(0)
+  const [maxAgeRating, setMaxAgeRating] = useState('teen')
 
   useEffect(() => {
     fetchData()
@@ -103,11 +108,35 @@ export default function Browse() {
   }, [featured])
 
   const fetchData = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+
+    // Determine max age rating for this user
+    const RATING_ORDER = ['everyone', 'teen', 'mature', 'adult']
+    let userMaxRating = 'teen' // default for logged-out users
+
+    if (session) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('age_verified, date_of_birth')
+        .eq('id', session.user.id)
+        .single()
+
+      if (userData?.date_of_birth) {
+        const age = Math.floor((Date.now() - new Date(userData.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+        if (age >= 18) userMaxRating = 'adult'
+        else if (age >= 17) userMaxRating = 'mature'
+        else if (age >= 13) userMaxRating = 'teen'
+        else userMaxRating = 'everyone'
+      }
+    }
+    setMaxAgeRating(userMaxRating)
+
     const [{ data: novels }, { data: featuredRows }] = await Promise.all([
       supabase
         .from('novels')
         .select('*')
-        .eq('is_published', true),
+        .eq('is_published', true)
+        .eq('is_taken_down', false),
       supabase
         .from('featured_novels')
         .select('novel_id, display_order')
@@ -115,12 +144,21 @@ export default function Browse() {
         .limit(5),
     ])
 
-    if (novels) setAllNovels(novels)
+    const maxIndex = RATING_ORDER.indexOf(userMaxRating)
 
-    if (featuredRows && novels) {
+    // Filter novels by age rating
+    const ageFiltered = (novels || []).filter((n: any) => {
+      const novelIndex = RATING_ORDER.indexOf(n.age_rating || 'everyone')
+      if (userMaxRating !== 'adult' && isNSFW(n.genres || [], n.age_rating)) return false
+      return novelIndex <= maxIndex
+    })
+
+    setAllNovels(ageFiltered)
+
+    if (featuredRows && ageFiltered) {
       const featuredIds = featuredRows.map((f: any) => f.novel_id)
       const featuredNovels = featuredIds
-        .map((id: string) => novels.find((n: any) => n.id === id))
+        .map((id: string) => ageFiltered.find((n: any) => n.id === id))
         .filter(Boolean)
       setFeatured(featuredNovels)
     }
@@ -252,6 +290,7 @@ export default function Browse() {
           </>
         )}
       </main>
+      <Footer />
     </div>
   )
 }

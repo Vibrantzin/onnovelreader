@@ -12,6 +12,7 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [dob, setDob] = useState('')
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState<string | null>(null)
   const [message, setMessage] = useState('')
@@ -54,6 +55,9 @@ export default function Login() {
 
   const handleSignup = async () => {
     if (!email || !password || !confirmPassword) return showError('Please fill in all fields.')
+    if (!dob) return showError('Please enter your date of birth.')
+    const age = Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+    if (age < 13) return showError('You must be at least 13 years old to create an account.')
     if (password !== confirmPassword) return showError('Passwords do not match.')
     if (password.length < 6) return showError('Password must be at least 6 characters.')
 
@@ -69,6 +73,14 @@ export default function Login() {
     } else if (data.user && data.user.identities && data.user.identities.length === 0) {
       showError('An account with this email already exists.')
     } else {
+      // Save DOB and age_verified status
+      if (data.user) {
+        const age = Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+        await supabase.from('users').update({
+          date_of_birth: dob,
+          age_verified: age >= 18,
+        }).eq('id', data.user.id)
+      }
       showSuccess('Account created! Check your email to verify your account.')
     }
     setLoading(false)
@@ -199,6 +211,21 @@ export default function Login() {
               onChange={(e) => setConfirmPassword(e.target.value)}
               className="w-full px-4 py-3 border border-zinc-200 rounded-sm focus:outline-none focus:border-zinc-900 transition-colors text-sm"
             />
+          )}
+
+          {/* Date of birth */}
+          {view === 'signup' && (
+            <div>
+              <label className="text-xs text-zinc-400 mb-1 block">Date of Birth</label>
+              <input
+                type="date"
+                value={dob}
+                onChange={(e) => setDob(e.target.value)}
+                max={new Date().toISOString().split('T')[0]}
+                className="w-full px-4 py-3 border border-zinc-200 rounded-sm focus:outline-none focus:border-zinc-900 transition-colors text-sm"
+              />
+              <p className="text-xs text-zinc-300 mt-1">Required. Used to verify your age for mature content.</p>
+            </div>
           )}
 
           {/* Message */}

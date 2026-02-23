@@ -10,6 +10,8 @@ export default function Dashboard() {
   const [novels, setNovels] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreating, setIsCreating] = useState(false)
+  const [accountStatus, setAccountStatus] = useState('active')
+  const [statusReason, setStatusReason] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [title, setTitle] = useState('')
   const [synopsis, setSynopsis] = useState('')
@@ -21,24 +23,51 @@ export default function Dashboard() {
   }, [])
 
   const checkUserAndFetchNovels = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      router.push('/login')
-      return
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        router.push('/login')
+        return
+      }
+
+      // Fetch user status and novels in parallel
+      const [{ data: userData }, { data: novelsData, error: novelsError }] = await Promise.all([
+        supabase
+          .from('users')
+          .select('account_status, status_reason, status_expires_at')
+          .eq('id', session.user.id)
+          .single(),
+        supabase
+          .from('novels')
+          .select('*')
+          .eq('author_id', session.user.id)
+          .order('created_at', { ascending: false }),
+      ])
+
+      // Handle account status
+      if (userData) {
+        const status = userData.account_status || 'active'
+        setAccountStatus(status)
+        setStatusReason(userData.status_reason || '')
+
+        // Sign out suspended/banned users
+        if (status === 'suspended' || status === 'permanently_banned') {
+          await supabase.auth.signOut()
+          router.push('/login?banned=1')
+          return
+        }
+      }
+
+      if (novelsError) {
+        console.error('Fetch error:', novelsError)
+        setError('Failed to load novels: ' + novelsError.message)
+      }
+
+      if (novelsData) setNovels(novelsData)
+    } catch (err) {
+      console.error('Unexpected error:', err)
+      setError('Something went wrong. Please refresh the page.')
     }
-
-    const { data, error } = await supabase
-      .from('novels')
-      .select('*')
-      .eq('author_id', session.user.id)
-      .order('created_at', { ascending: false })
-
-    if (error) {
-      console.error('Fetch error:', error)
-      setError('Failed to load novels: ' + error.message)
-    }
-
-    if (data) setNovels(data)
     setLoading(false)
   }
 
@@ -81,13 +110,26 @@ export default function Dashboard() {
       <Navbar />
 
       <main className="max-w-4xl mx-auto mt-12 px-8">
+        {(accountStatus === 'posting_banned' || accountStatus === 'warned') && (
+          <div className={`border rounded-xl p-4 mb-6 flex gap-3 items-start ${accountStatus === 'posting_banned' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'}`}>
+            <span className="text-xl">{accountStatus === 'posting_banned' ? '🚫' : '⚠️'}</span>
+            <div>
+              <p className={`text-sm font-semibold ${accountStatus === 'posting_banned' ? 'text-red-700' : 'text-yellow-700'}`}>
+                {accountStatus === 'posting_banned' ? 'Your account has been restricted from posting.' : 'Your account has received a warning.'}
+              </p>
+              {statusReason && <p className={`text-xs mt-1 ${accountStatus === 'posting_banned' ? 'text-red-500' : 'text-yellow-600'}`}>Reason: {statusReason}</p>}
+              <p className="text-xs mt-1 text-zinc-400">If you believe this is a mistake, contact support@novelreader.tech.</p>
+            </div>
+          </div>
+        )}
+
         <div className="flex justify-between items-end mb-8">
           <h2 className="text-3xl font-semibold">Your Library</h2>
           <button
             onClick={() => { setIsCreating(!isCreating); setError('') }}
             className="bg-black text-white px-5 py-2 rounded text-sm font-medium hover:bg-zinc-800 transition-colors"
           >
-            {isCreating ? 'Cancel' : '+ New Novel'}
+  {isCreating ? 'Cancel' : '+ New Novel'}
           </button>
         </div>
 

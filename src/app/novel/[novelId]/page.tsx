@@ -5,6 +5,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import Footer from '@/components/Footer'
+import AgeGate, { isNSFW } from '@/components/AgeGate'
 import Navbar from '@/components/Navbar'
 
 function StarPicker({ value, onChange }: { value: number; onChange: (v: number) => void }) {
@@ -22,6 +24,7 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
           ★
         </button>
       ))}
+      <Footer />
     </div>
   )
 }
@@ -38,6 +41,9 @@ export default function NovelPage() {
   const [isFollowing, setIsFollowing] = useState(false)
   const [loading, setLoading] = useState(true)
   const [fetchError, setFetchError] = useState('')
+  const [showAgeGate, setShowAgeGate] = useState(false)
+  const [ageVerified, setAgeVerified] = useState(false)
+  const [blocked, setBlocked] = useState(false)
 
   // Review form
   const [userReview, setUserReview] = useState<any>(null)
@@ -75,6 +81,13 @@ export default function NovelPage() {
       return
     }
 
+    // Block taken down novels for everyone except admin
+    if (novelData.is_taken_down) {
+      setFetchError('This novel has been removed for violating our content policies.')
+      setLoading(false)
+      return
+    }
+
     const { data: authorData } = await supabase
       .from('users')
       .select('username')
@@ -98,6 +111,14 @@ export default function NovelPage() {
     setNovel(novel)
     setChapters(chapters || [])
     setReviews(reviews || [])
+
+    // Check if NSFW — show age gate if not yet verified this session
+    if (isNSFW(novel.genres || [], novel.age_rating)) {
+      const verified = sessionStorage.getItem('age_verified')
+      if (!verified) {
+        setShowAgeGate(true)
+      }
+    }
 
     if (session) {
       const { data: followData } = await supabase
@@ -185,6 +206,13 @@ export default function NovelPage() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-[#faf9f7]">
       <p className="text-zinc-400 text-sm tracking-widest uppercase animate-pulse">Loading...</p>
+    </div>
+  )
+
+  if (blocked) return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white gap-4">
+      <p className="text-zinc-500 text-sm">This content is not available for your age group.</p>
+      <a href="/browse" className="text-sm text-zinc-900 underline">Back to Browse</a>
     </div>
   )
 

@@ -13,6 +13,11 @@ export default function Settings() {
 
   // Profile
   const [username, setUsername] = useState('')
+  const [dob, setDob] = useState('')
+  const [ageVerified, setAgeVerified] = useState(false)
+  const [savingDob, setSavingDob] = useState(false)
+  const [dobMsg, setDobMsg] = useState('')
+  const [showDobBanner, setShowDobBanner] = useState(false)
   const [originalUsername, setOriginalUsername] = useState('')
   const [savingUsername, setSavingUsername] = useState(false)
   const [usernameMsg, setUsernameMsg] = useState('')
@@ -36,18 +41,39 @@ export default function Settings() {
 
       const { data: userData } = await supabase
         .from('users')
-        .select('username')
+        .select('username, date_of_birth, age_verified')
         .eq('id', session.user.id)
         .single()
 
       if (userData) {
         setUsername(userData.username)
         setOriginalUsername(userData.username)
+        setDob(userData.date_of_birth || '')
+        setAgeVerified(userData.age_verified || false)
+        if (!userData.date_of_birth) setShowDobBanner(true)
       }
       setLoading(false)
     }
     fetchUser()
   }, [router])
+
+  const handleSaveDob = async () => {
+    if (!dob) { setDobMsg('Please select your date of birth.'); return }
+    setSavingDob(true)
+    const age = Math.floor((Date.now() - new Date(dob).getTime()) / (365.25 * 24 * 60 * 60 * 1000))
+    if (age < 13) { setDobMsg('You must be at least 13 years old.'); setSavingDob(false); return }
+    const { error } = await supabase.from('users').update({
+      date_of_birth: dob,
+      age_verified: age >= 18,
+    }).eq('id', session.user.id)
+    if (error) { setDobMsg(error.message) }
+    else {
+      setAgeVerified(age >= 18)
+      setShowDobBanner(false)
+      setDobMsg(age >= 18 ? 'Age verified! You can now access mature content.' : 'Date of birth saved.')
+    }
+    setSavingDob(false)
+  }
 
   const handleSaveUsername = async () => {
     if (!username.trim()) { setUsernameError(true); setUsernameMsg('Username cannot be empty.'); return }
@@ -140,6 +166,37 @@ export default function Settings() {
       <main className="max-w-xl mx-auto mt-12 px-8">
         <h1 className="text-3xl font-semibold mb-10">User Settings</h1>
 
+        {/* DOB banner for existing users */}
+        {showDobBanner && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 mb-6 flex items-start gap-3">
+            <span className="text-xl">🔞</span>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-amber-800 mb-1">Please verify your age</p>
+              <p className="text-xs text-amber-600 mb-3">We need your date of birth to determine which content you can access. This is required for mature content.</p>
+              <div className="flex gap-3 items-end flex-wrap">
+                <div>
+                  <label className="text-xs text-amber-700 block mb-1">Date of Birth</label>
+                  <input
+                    type="date"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    max={new Date().toISOString().split('T')[0]}
+                    className="px-3 py-2 border border-amber-200 rounded-lg text-sm focus:outline-none focus:border-amber-400 bg-white"
+                  />
+                </div>
+                <button
+                  onClick={handleSaveDob}
+                  disabled={savingDob}
+                  className="bg-amber-500 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-amber-600 disabled:opacity-50 transition-colors"
+                >
+                  {savingDob ? 'Saving...' : 'Verify Age'}
+                </button>
+              </div>
+              {dobMsg && <p className="text-xs text-amber-700 mt-2">{dobMsg}</p>}
+            </div>
+          </div>
+        )}
+
         {/* Username */}
         <section className="bg-white border border-zinc-200 rounded-xl p-6 mb-6">
           <h2 className="text-base font-semibold mb-1">Username</h2>
@@ -172,6 +229,30 @@ export default function Settings() {
             disabled
             className="w-full px-4 py-2.5 border border-zinc-100 rounded-lg text-sm bg-zinc-50 text-zinc-400 cursor-not-allowed"
           />
+        </section>
+
+        {/* Date of Birth */}
+        <section className="bg-white border border-zinc-200 rounded-xl p-6 mb-6">
+          <h2 className="text-base font-semibold mb-1">Date of Birth</h2>
+          <p className="text-sm text-zinc-400 mb-4">
+            Used to verify your age for mature content.
+            {ageVerified && <span className="text-green-600 font-medium"> ✓ Age verified (18+)</span>}
+          </p>
+          <input
+            type="date"
+            value={dob}
+            onChange={(e) => setDob(e.target.value)}
+            max={new Date().toISOString().split('T')[0]}
+            className="w-full px-4 py-2.5 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:border-zinc-500 mb-3"
+          />
+          {dobMsg && <p className={`text-xs mb-3 ${dobMsg.includes('verified') ? 'text-green-600' : 'text-zinc-500'}`}>{dobMsg}</p>}
+          <button
+            onClick={handleSaveDob}
+            disabled={savingDob}
+            className="bg-zinc-900 text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-zinc-700 disabled:opacity-50 transition-colors"
+          >
+            {savingDob ? 'Saving...' : 'Save Date of Birth'}
+          </button>
         </section>
 
         {/* Change Password */}

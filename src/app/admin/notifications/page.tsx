@@ -9,7 +9,7 @@ import { useRouter } from 'next/navigation'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 
-const ADMIN_USER_ID = 'YOUR_USER_ID_HERE'
+const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_USER_ID || ''
 
 type NotifType = 'admin_warning' | 'copyright_notice' | 'chosen_pick'
 

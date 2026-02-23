@@ -11,7 +11,7 @@ import Navbar from '@/components/Navbar'
 
 // Replace this with your own Supabase user ID to restrict access
 // Find it in Supabase → Authentication → Users → your account
-const ADMIN_USER_ID = 'YOUR_USER_ID_HERE'
+const ADMIN_USER_ID = process.env.NEXT_PUBLIC_ADMIN_USER_ID || ''
 
 export default function AdminFeatured() {
   const router = useRouter()
