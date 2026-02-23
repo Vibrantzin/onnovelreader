@@ -93,17 +93,35 @@ export default function AdminNotifications() {
       // Fire email for critical notification types
       if (notifType === 'admin_warning' || notifType === 'copyright_notice') {
         try {
-          const { error: emailError } = await supabase.functions.invoke('notify-email', {
-            body: { user_id: targetUserId, title, message },
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+          const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+          const { data: { session } } = await supabase.auth.getSession()
+
+          const res = await fetch(`${supabaseUrl}/functions/v1/notify-email`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session?.access_token}`,
+              'apikey': supabaseAnonKey!,
+            },
+            body: JSON.stringify({ user_id: targetUserId, title, message }),
           })
-          if (emailError) console.error('Email send error:', emailError)
-          setIsError(false)
-          setResult('Notification sent and email delivered.')
+
+          const resData = await res.json()
+          console.log('Edge function response:', res.status, resData)
+
+          if (!res.ok) {
+            console.error('Email error:', resData)
+            setIsError(false)
+            setResult(`Notification sent (email failed: ${resData.error || res.status})`)
+          } else {
+            setIsError(false)
+            setResult('Notification sent and email delivered.')
+          }
         } catch (e) {
           console.error('Email function unreachable:', e)
-          // Notification was still saved in-app — only email failed
           setIsError(false)
-          setResult('Notification sent (email delivery failed — check Edge Function deployment).')
+          setResult('Notification sent (email delivery failed — check console).')
         }
       } else {
         setIsError(false)
