@@ -38,7 +38,7 @@ export default function Dashboard() {
       const [{ data: userData }, { data: novelsData, error: novelsError }] = await Promise.all([
         supabase
           .from('users')
-          .select('account_status, status_reason, status_expires_at')
+          .select('account_status, status_reason, status_expires_at, date_of_birth')
           .eq('id', session.user.id)
           .single(),
         supabase
