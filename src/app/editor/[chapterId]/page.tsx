@@ -208,7 +208,7 @@ export default function Editor() {
 
         {/* Toolbar row */}
         <div className="flex items-center gap-1 px-6 py-2 overflow-x-auto">
-
+ 
           {/* Font picker */}
           <select
             value={font}
