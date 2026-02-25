@@ -13,6 +13,7 @@ export default function Login() {
   useEffect(() => { document.title = 'Sign In | Novel Reader' }, [])
   const [view, setView] = useState<View>('login')
   const [email, setEmail] = useState('')
+  const [statusMsg, setStatusMsg] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [dob, setDob] = useState('')
@@ -118,6 +119,8 @@ export default function Login() {
     // On success Supabase redirects automatically — no need to clear loading
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent) => { if (e.key === 'Enter') handleSubmit() }
+
   const handleSubmit = () => {
     if (view === 'login') handleLogin()
     else if (view === 'signup') handleSignup()
@@ -127,6 +130,13 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-white text-zinc-900 font-sans">
       <div className="w-full max-w-sm p-8">
+
+        {statusMsg && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-xl px-4 py-4 text-center">
+            <p className="text-sm font-semibold text-red-700 mb-1">Account Restricted</p>
+            <p className="text-xs text-red-500">{statusMsg}</p>
+          </div>
+        )}
 
         {/* Branding */}
         <div className="text-center mb-10">
@@ -191,7 +201,8 @@ export default function Login() {
             placeholder="Email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full px-4 py-3 border border-zinc-200 rounded-sm focus:outline-none focus:border-zinc-900 transition-colors text-sm"
+            onKeyDown={handleKeyDown}
+              className="w-full px-4 py-3 border border-zinc-200 rounded-sm focus:outline-none focus:border-zinc-900 transition-colors text-sm"
           />
 
           {/* Password */}
@@ -201,6 +212,7 @@ export default function Login() {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full px-4 py-3 border border-zinc-200 rounded-sm focus:outline-none focus:border-zinc-900 transition-colors text-sm"
             />
           )}
@@ -212,6 +224,7 @@ export default function Login() {
               placeholder="Confirm password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
               className="w-full px-4 py-3 border border-zinc-200 rounded-sm focus:outline-none focus:border-zinc-900 transition-colors text-sm"
             />
           )}
@@ -225,7 +238,8 @@ export default function Login() {
                 value={dob}
                 onChange={(e) => setDob(e.target.value)}
                 max={new Date().toISOString().split('T')[0]}
-                className="w-full px-4 py-3 border border-zinc-200 rounded-sm focus:outline-none focus:border-zinc-900 transition-colors text-sm"
+                onKeyDown={handleKeyDown}
+              className="w-full px-4 py-3 border border-zinc-200 rounded-sm focus:outline-none focus:border-zinc-900 transition-colors text-sm"
               />
               <p className="text-xs text-zinc-300 mt-1">Required. Used to verify your age for mature content.</p>
             </div>
