@@ -268,9 +268,9 @@ export default function NovelDetail() {
   )
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-20">
+    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-16 md:pb-20">
       <Navbar />
-      <div className="bg-white border-b border-zinc-100 px-8 py-3 flex justify-between items-center">
+      <div className="bg-white border-b border-zinc-100 px-4 md:px-4 md:px-8 py-3 flex justify-between items-center">
         <div className="flex items-center gap-3 text-sm">
           <Link href="/dashboard" className="text-zinc-400 hover:text-black transition-colors">← Dashboard</Link>
           <span className="text-zinc-200">|</span>
@@ -310,7 +310,7 @@ export default function NovelDetail() {
         </div>
       </div>
 
-      <main className="max-w-3xl mx-auto mt-12 px-8">
+      <main className="max-w-3xl mx-auto mt-12 px-4 md:px-8">
 
         {/* Cover + info section */}
         <div className="flex gap-6 mb-10 items-start">
@@ -319,7 +319,7 @@ export default function NovelDetail() {
               {novel?.cover_image_url ? (
                 <img src={novel.cover_image_url} alt="Cover" className="w-full h-full object-cover" />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-3xl text-zinc-300">📖</div>
+                <div className="w-full h-full flex items-center justify-center text-xl md:text-2xl md:text-3xl text-zinc-300">📖</div>
               )}
             </div>
             <input
@@ -340,7 +340,7 @@ export default function NovelDetail() {
           </div>
 
           <div className="flex-1">
-            <h2 className="text-3xl font-semibold mb-2">{novel?.title}</h2>
+            <h2 className="text-xl md:text-2xl md:text-3xl font-semibold mb-2">{novel?.title}</h2>
             {novel?.synopsis && (
               <p className="text-zinc-500 text-sm mb-4 max-w-xl">{novel.synopsis}</p>
             )}

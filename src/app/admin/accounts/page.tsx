@@ -113,6 +113,25 @@ export default function AdminAccounts() {
         p_novel_id: null,
       })
 
+      // Force sign out if suspending or banning
+      if (action === 'suspended' || action === 'permanently_banned') {
+        try {
+          const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+          const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+          await fetch(`${supabaseUrl}/functions/v1/enforce-suspension`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${supabaseAnonKey}`,
+              'apikey': supabaseAnonKey!,
+            },
+            body: JSON.stringify({ target_user_id: selected.id }),
+          })
+        } catch (e) {
+          console.error('Force signout failed:', e)
+        }
+      }
+
       setIsError(false)
       setResult(`Action applied: ${actionConfig?.label} for ${selected.username}.`)
       setSelected(null)
@@ -147,21 +166,21 @@ export default function AdminAccounts() {
   return (
     <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-20">
       <Navbar />
-      <div className="bg-white border-b border-zinc-100 px-8 py-3 flex items-center gap-3 text-sm">
+      <div className="bg-white border-b border-zinc-100 px-4 md:px-4 md:px-8 py-3 flex flex-wrap items-center gap-3 text-sm">
         <Link href="/admin/featured" className="text-zinc-400 hover:text-black transition-colors">← Admin</Link>
         <span className="text-zinc-200">|</span>
         <span className="font-medium text-zinc-700">👤 Account Moderation</span>
         <span className="ml-auto text-xs text-zinc-400">{users.length} total users</span>
       </div>
 
-      <main className="max-w-6xl mx-auto mt-10 px-8 flex gap-8">
+      <main className="max-w-6xl mx-auto mt-6 md:mt-10 px-4 md:px-8 flex flex-col md:flex-row gap-5 md:gap-8">
 
         {/* Left: User list */}
         <div className="flex-1 min-w-0">
-          <h1 className="text-2xl font-semibold mb-2">Account Moderation</h1>
+          <h1 className="text-xl md:text-xl md:text-2xl font-semibold mb-2">Account Moderation</h1>
           <p className="text-sm text-zinc-400 mb-6">Select a user to apply a moderation action.</p>
 
-          <div className="flex gap-2 flex-wrap mb-4">
+          <div className="flex gap-2 flex-wrap mb-3 md:mb-4">
             {['all', 'active', 'warned', 'posting_banned', 'suspended', 'permanently_banned'].map((f) => (
               <button
                 key={f}
@@ -224,9 +243,9 @@ export default function AdminAccounts() {
         </div>
 
         {/* Right: Action panel */}
-        <div className="w-80 shrink-0">
+        <div className="w-full lg:w-80 lg:shrink-0">
           {selected ? (
-            <div className="bg-white border border-zinc-200 rounded-xl p-6 sticky top-24">
+            <div className="bg-white border border-zinc-200 rounded-xl p-4 md:p-6 sticky top-24">
               <h2 className="font-semibold text-zinc-900 mb-1">Moderating: <span className="text-zinc-600">{selected.username}</span></h2>
               <p className="text-xs text-zinc-400 mb-5">
                 Current status: <span className="font-medium">{STATUS_CONFIG[selected.account_status as keyof typeof STATUS_CONFIG]?.label || 'Active'}</span>

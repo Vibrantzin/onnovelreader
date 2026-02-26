@@ -116,10 +116,10 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-20">
+    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-16 md:pb-20">
       <Navbar />
 
-      <main className="max-w-4xl mx-auto mt-12 px-8">
+      <main className="max-w-4xl mx-auto mt-12 px-4 md:px-8">
         {(accountStatus === 'posting_banned' || accountStatus === 'warned') && (
           <div className={`border rounded-xl p-4 mb-6 flex gap-3 items-start ${accountStatus === 'posting_banned' ? 'bg-red-50 border-red-200' : 'bg-yellow-50 border-yellow-200'}`}>
             <span className="text-xl">{accountStatus === 'posting_banned' ? '🚫' : '⚠️'}</span>
@@ -133,8 +133,8 @@ export default function Dashboard() {
           </div>
         )}
 
-        <div className="flex justify-between items-end mb-8">
-          <h2 className="text-3xl font-semibold">Your Library</h2>
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-4 mb-8">
+          <h2 className="text-xl md:text-2xl md:text-3xl font-semibold">Your Library</h2>
           <button
             onClick={() => { setIsCreating(!isCreating); setError('') }}
             className="bg-black text-white px-5 py-2 rounded text-sm font-medium hover:bg-zinc-800 transition-colors"

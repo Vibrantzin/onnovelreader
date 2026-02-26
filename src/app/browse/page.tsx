@@ -51,7 +51,7 @@ function NovelCard({ novel }: { novel: any }) {
             <img src={novel.cover_image_url} alt={novel.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
-              <span className="text-zinc-300 text-4xl">📖</span>
+              <span className="text-zinc-300 text-xl md:text-2xl md:text-4xl">📖</span>
             </div>
           )}
         </div>
@@ -79,7 +79,7 @@ function Section({ title, subtitle, novels }: { title: string; subtitle: string;
         <h2 className="text-xl font-semibold text-zinc-900">{title}</h2>
         <p className="text-sm text-zinc-400 mt-0.5">{subtitle}</p>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {novels.slice(0, 5).map((n) => <NovelCard key={n.id} novel={n} />)}
       </div>
     </section>
@@ -197,7 +197,7 @@ export default function Browse() {
 
         {/* Featured Banner (Chosen Pick) */}
         {currentFeatured && (
-          <section className="mb-14 relative rounded-2xl overflow-hidden h-72 bg-zinc-900">
+          <section className="mb-14 relative rounded-2xl overflow-hidden h-48 md:h-72 bg-zinc-900">
             {currentFeatured.cover_image_url && (
               <img
                 src={currentFeatured.cover_image_url}
@@ -208,7 +208,7 @@ export default function Browse() {
             <div className="absolute inset-0 bg-gradient-to-r from-zinc-900 via-zinc-900/70 to-transparent" />
             <div className="relative z-10 h-full flex flex-col justify-center px-10">
               <span className="text-xs font-semibold tracking-widest text-amber-400 uppercase mb-3">✦ Chosen Pick</span>
-              <h2 className="text-3xl font-bold text-white mb-2 max-w-md">{currentFeatured.title}</h2>
+              <h2 className="text-xl md:text-2xl md:text-xl md:text-3xl font-bold text-white mb-2 max-w-md">{currentFeatured.title}</h2>
               <p className="text-zinc-300 text-sm max-w-sm line-clamp-2 mb-5">{currentFeatured.synopsis}</p>
               <Link
                 href={`/novel/${currentFeatured.id}`}
@@ -270,7 +270,7 @@ export default function Browse() {
             {filteredNovels.length === 0 ? (
               <p className="text-zinc-400 text-sm">No novels found.</p>
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-2 sm:grid-cols-3 md:grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
                 {filteredNovels.map((n) => <NovelCard key={n.id} novel={n} />)}
               </div>
             )}

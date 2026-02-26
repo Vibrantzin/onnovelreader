@@ -5,13 +5,13 @@ import Footer from '@/components/Footer'
 export default function Privacy() {
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900">
-      <nav className="border-b border-zinc-100 px-8 py-5 flex justify-between items-center">
-        <Link href="/" className="text-lg font-bold tracking-tighter">NOVEL READER</Link>
+      <nav className="border-b border-zinc-100 px-4 md:px-8 py-4 md:py-5 flex justify-between items-center">
+        <Link href="/" className="text-base md:text-lg font-bold tracking-tighter">NOVEL READER</Link>
         <Link href="/browse" className="text-sm text-zinc-500 hover:text-zinc-900 transition-colors">Browse</Link>
       </nav>
 
-      <main className="max-w-3xl mx-auto px-8 py-16">
-        <h1 className="text-3xl font-bold mb-2">Privacy Policy</h1>
+      <main className="max-w-3xl mx-auto px-4 md:px-8 py-10 md:py-16">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">Privacy Policy</h1>
         <p className="text-sm text-zinc-400 mb-2">Last Updated: February 23, 2026</p>
         <p className="text-sm text-zinc-400 mb-10">This policy explains what kinds of data Novel Reader collects, how it is used, and your rights regarding your personal information on Novel Reader.</p>
 

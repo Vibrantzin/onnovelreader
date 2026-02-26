@@ -128,8 +128,8 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white text-zinc-900 font-sans">
-      <div className="w-full max-w-sm p-8">
+    <div className="min-h-screen flex items-center justify-center bg-white text-zinc-900 font-sans px-4">
+      <div className="w-full max-w-sm p-6 md:p-8">
 
         {statusMsg && (
           <div className="mb-6 bg-red-50 border border-red-200 rounded-xl px-4 py-4 text-center">
@@ -140,7 +140,7 @@ export default function Login() {
 
         {/* Branding */}
         <div className="text-center mb-10">
-          <h1 className="text-2xl font-bold tracking-tighter mb-2">NOVEL READER</h1>
+          <h1 className="text-xl md:text-xl md:text-2xl font-bold tracking-tighter mb-2">NOVEL READER</h1>
           <p className="text-sm text-zinc-500">
             {view === 'login' && 'Welcome back to your stories.'}
             {view === 'signup' && 'Create your account to start writing.'}

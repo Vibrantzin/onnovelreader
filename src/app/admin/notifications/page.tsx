@@ -154,17 +154,17 @@ export default function AdminNotifications() {
   return (
     <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-20">
       <Navbar />
-      <div className="bg-white border-b border-zinc-100 px-8 py-3 flex items-center gap-3 text-sm">
+      <div className="bg-white border-b border-zinc-100 px-4 md:px-4 md:px-8 py-3 flex flex-wrap items-center gap-3 text-sm">
         <Link href="/admin/featured" className="text-zinc-400 hover:text-black transition-colors">← Featured</Link>
         <span className="text-zinc-200">|</span>
         <span className="font-medium text-zinc-700">⚠️ Admin — Send Notification</span>
       </div>
 
-      <main className="max-w-2xl mx-auto mt-10 px-8">
-        <h1 className="text-2xl font-semibold mb-2">Send Notification</h1>
+      <main className="max-w-2xl mx-auto mt-6 md:mt-10 px-4 md:px-8">
+        <h1 className="text-xl md:text-xl md:text-2xl font-semibold mb-2">Send Notification</h1>
         <p className="text-sm text-zinc-400 mb-8">Send warnings, copyright notices, or announcements to users. Critical types will also trigger an email.</p>
 
-        <form onSubmit={handleSend} className="bg-white border border-zinc-200 rounded-xl p-6 flex flex-col gap-5">
+        <form onSubmit={handleSend} className="bg-white border border-zinc-200 rounded-xl p-4 md:p-6 flex flex-col gap-5">
 
           {/* Target type */}
           <div>

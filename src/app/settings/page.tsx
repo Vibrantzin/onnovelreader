@@ -150,8 +150,8 @@ export default function Settings() {
   )
 
   return (
-    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-20">
-      <header className="bg-white border-b border-zinc-200 px-8 py-5 flex justify-between items-center">
+    <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-16 md:pb-20">
+      <header className="bg-white border-b border-zinc-200 px-4 md:px-8 py-5 flex justify-between items-center">
         <div className="flex items-center gap-6">
           <Link href="/" className="text-lg font-bold tracking-tighter">NOVEL READER</Link>
           <nav className="flex items-center gap-5 text-sm font-medium text-zinc-500">
@@ -168,8 +168,8 @@ export default function Settings() {
         </button>
       </header>
 
-      <main className="max-w-xl mx-auto mt-12 px-8">
-        <h1 className="text-3xl font-semibold mb-10">User Settings</h1>
+      <main className="max-w-xl mx-auto mt-12 px-4 md:px-8">
+        <h1 className="text-xl md:text-2xl md:text-3xl font-semibold mb-10">User Settings</h1>
 
         {/* DOB banner for existing users */}
         {showDobBanner && (
@@ -178,7 +178,7 @@ export default function Settings() {
             <div className="flex-1">
               <p className="text-sm font-semibold text-amber-800 mb-1">Please verify your age</p>
               <p className="text-xs text-amber-600 mb-3">We need your date of birth to determine which content you can access. This is required for mature content.</p>
-              <div className="flex gap-3 items-end flex-wrap">
+              <div className="flex flex-col sm:flex-row gap-3 items-end flex-wrap">
                 <div>
                   <label className="text-xs text-amber-700 block mb-1">Date of Birth</label>
                   <input
@@ -203,7 +203,7 @@ export default function Settings() {
         )}
 
         {/* Username */}
-        <section className="bg-white border border-zinc-200 rounded-xl p-6 mb-6">
+        <section className="bg-white border border-zinc-200 rounded-xl p-4 md:p-6 mb-4 md:mb-6">
           <h2 className="text-base font-semibold mb-1">Username</h2>
           <p className="text-sm text-zinc-400 mb-4">This is how other readers will see you.</p>
           <input
@@ -225,7 +225,7 @@ export default function Settings() {
         </section>
 
         {/* Email (read-only) */}
-        <section className="bg-white border border-zinc-200 rounded-xl p-6 mb-6">
+        <section className="bg-white border border-zinc-200 rounded-xl p-4 md:p-6 mb-4 md:mb-6">
           <h2 className="text-base font-semibold mb-1">Email</h2>
           <p className="text-sm text-zinc-400 mb-4">Your account email address.</p>
           <input
@@ -237,7 +237,7 @@ export default function Settings() {
         </section>
 
         {/* Date of Birth */}
-        <section className="bg-white border border-zinc-200 rounded-xl p-6 mb-6">
+        <section className="bg-white border border-zinc-200 rounded-xl p-4 md:p-6 mb-4 md:mb-6">
           <h2 className="text-base font-semibold mb-1">Date of Birth</h2>
           <p className="text-sm text-zinc-400 mb-4">
             Used to verify your age for mature content.
@@ -261,7 +261,7 @@ export default function Settings() {
         </section>
 
         {/* Change Password */}
-        <section className="bg-white border border-zinc-200 rounded-xl p-6 mb-6">
+        <section className="bg-white border border-zinc-200 rounded-xl p-4 md:p-6 mb-4 md:mb-6">
           <h2 className="text-base font-semibold mb-1">Change Password</h2>
           <p className="text-sm text-zinc-400 mb-4">Choose a new password for your account.</p>
           <input

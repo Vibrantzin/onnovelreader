@@ -5,13 +5,13 @@ import Footer from '@/components/Footer'
 export default function ContentPolicy() {
   return (
     <div className="min-h-screen bg-white font-sans text-zinc-900">
-      <nav className="border-b border-zinc-100 px-8 py-5 flex justify-between items-center">
-        <Link href="/" className="text-lg font-bold tracking-tighter">NOVEL READER</Link>
+      <nav className="border-b border-zinc-100 px-4 md:px-8 py-4 md:py-5 flex justify-between items-center">
+        <Link href="/" className="text-base md:text-lg font-bold tracking-tighter">NOVEL READER</Link>
         <Link href="/browse" className="text-sm text-zinc-500 hover:text-zinc-900 transition-colors">Browse</Link>
       </nav>
 
-      <main className="max-w-3xl mx-auto px-8 py-16">
-        <h1 className="text-3xl font-bold mb-2">Content Policy</h1>
+      <main className="max-w-3xl mx-auto px-4 md:px-8 py-10 md:py-16">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2">Content Policy</h1>
         <p className="text-sm text-zinc-400 mb-2">Last Updated: February 23, 2026</p>
         <p className="text-sm text-zinc-400 mb-10">This policy defines what content is permitted, how content must be labeled/handled, and how violations are managed by us. All authors publishing on Novel Reader are bound by this policy.</p>
 
@@ -145,7 +145,7 @@ export default function ContentPolicy() {
                 { label: '☠️ Permanent Ban', desc: 'The account and all works is permanently and irrevocably disabled. This is applied for the most serious violations or for repeat offenders.' },
               ].map((a) => (
                 <div key={a.label} className="flex gap-3 border border-zinc-100 rounded-xl p-4">
-                  <span className="font-semibold text-zinc-800 w-36 shrink-0">{a.label}</span>
+                  <span className="font-semibold text-zinc-800 w-24 md:w-36 shrink-0">{a.label}</span>
                   <span>{a.desc}</span>
                 </div>
               ))}
@@ -155,12 +155,12 @@ export default function ContentPolicy() {
 
           <section>
             <h2 className="text-lg font-semibold text-zinc-900 mb-3">8. Appeals</h2>
-            <p>If your content has been removed unjustly or your account has been actioned and you believe it was in error, you may appeal by emailing to us at<a href="mailto:support@novelreader.tech" className="text-zinc-900 underline">support@novelreader.tech</a> with the subject line of "Appeal" and a clear explanation of why you believe the moderation action was incorrect. We will review all appeals within an appropriate timeframe. Appeals regarding CSAM violations will not be considered.</p>
+            <p>If your content has been removed unjustly or your account has been actioned and you believe it was in error, you may appeal by emailing to us at <a href="mailto:support@novelreader.tech" className="text-zinc-900 underline">support@novelreader.tech</a> with the subject line of "Appeal" and a clear explanation of why you believe the moderation action was incorrect. We will review all appeals within an appropriate timeframe. Appeals regarding CSAM violations will not be considered.</p>
           </section>
 
           <section>
             <h2 className="text-lg font-semibold text-zinc-900 mb-3">9. Reporting Violations</h2>
-            <p>If you encounter content that violates this policy, please report it to us at<a href="mailto:support@novelreader.tech" className="text-zinc-900 underline">support@novelreader.tech</a> with the novel title, the URL, and a brief description of the violation. We will investigate all reports and take any appropriate action. Reports are kept purely confidential.</p>
+            <p>If you encounter content that violates this policy, please report it to us at <a href="mailto:support@novelreader.tech" className="text-zinc-900 underline">support@novelreader.tech</a> with the novel title, the URL, and a brief description of the violation. We will investigate all reports and take any appropriate action. Reports are kept purely confidential.</p>
           </section>
 
           <section>

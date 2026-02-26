@@ -112,13 +112,13 @@ export default function AdminFeatured() {
   return (
     <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-20">
       <Navbar />
-      <div className="bg-white border-b border-zinc-100 px-8 py-3 flex items-center gap-3 text-sm">
+      <div className="bg-white border-b border-zinc-100 px-4 md:px-4 md:px-8 py-3 flex flex-wrap items-center gap-3 text-sm">
         <Link href="/dashboard" className="text-zinc-400 hover:text-black transition-colors">← Dashboard</Link>
         <span className="text-zinc-200">|</span>
         <span className="font-medium text-zinc-700">✦ Chosen Pick — Admin</span>
       </div>
 
-      <main className="max-w-4xl mx-auto mt-10 px-8">
+      <main className="max-w-4xl mx-auto mt-6 md:mt-10 px-4 md:px-8">
 
         {/* Current featured */}
         <section className="mb-12">

@@ -181,7 +181,7 @@ export default function Editor() {
 
         {/* Nav row */}
         <div className="flex items-center justify-between px-6 py-3 border-b border-zinc-100">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <Link
               href={`/dashboard/${novelId}`}
               className="text-xs font-medium text-zinc-400 hover:text-zinc-800 transition-colors tracking-widest uppercase"
@@ -208,7 +208,7 @@ export default function Editor() {
 
         {/* Toolbar row */}
         <div className="flex items-center gap-1 px-6 py-2 overflow-x-auto">
- 
+
           {/* Font picker */}
           <select
             value={font}
@@ -271,7 +271,7 @@ export default function Editor() {
           value={title}
           onChange={(e) => { setTitle(e.target.value); scheduleAutoSave() }}
           placeholder="Chapter Title"
-          className="w-full max-w-2xl text-3xl font-semibold bg-transparent border-none outline-none text-zinc-800 placeholder-zinc-300 mb-8 text-center"
+          className="w-full max-w-2xl text-xl md:text-2xl md:text-3xl font-semibold bg-transparent border-none outline-none text-zinc-800 placeholder-zinc-300 mb-8 text-center"
           style={{ fontFamily: font }}
         />
 

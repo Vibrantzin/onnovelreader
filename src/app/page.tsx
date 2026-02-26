@@ -22,23 +22,23 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-white text-zinc-900 font-sans">
       <Navbar />
-      <main className="max-w-4xl mx-auto mt-24 px-8 text-center">
-        <h2 className="text-5xl font-semibold leading-tight mb-6">
+      <main className="max-w-4xl mx-auto mt-12 md:mt-24 px-4 md:px-8 text-center">
+        <h2 className="text-xl md:text-2xl md:text-3xl md:text-5xl font-semibold leading-tight mb-6">
           Write. Publish. <br /> Connect with readers.
         </h2>
         <p className="text-zinc-500 text-lg mb-10 max-w-xl mx-auto">
           A minimalist space for authors to craft their stories and readers to discover their next favorite world.
         </p>
-        <div className="flex justify-center gap-4">
+        <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
           <Link
             href="/browse"
-            className="px-8 py-3 bg-white text-zinc-900 border border-zinc-200 rounded font-medium hover:bg-zinc-50 transition-all"
+            className="px-4 md:px-8 py-3 bg-white text-zinc-900 border border-zinc-200 rounded font-medium hover:bg-zinc-50 transition-all"
           >
             Browse Novels
           </Link>
           <Link
             href={isLoggedIn ? '/dashboard' : '/login'}
-            className="px-8 py-3 bg-black text-white rounded font-medium hover:bg-zinc-800 transition-all"
+            className="px-4 md:px-8 py-3 bg-black text-white rounded font-medium hover:bg-zinc-800 transition-all"
           >
             Start Writing
           </Link>

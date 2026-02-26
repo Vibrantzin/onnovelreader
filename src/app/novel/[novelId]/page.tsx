@@ -19,7 +19,7 @@ function StarPicker({ value, onChange }: { value: number; onChange: (v: number) 
           onMouseEnter={() => setHover(s)}
           onMouseLeave={() => setHover(0)}
           onClick={() => onChange(s)}
-          className={`text-2xl transition-colors ${s <= (hover || value) ? 'text-amber-400' : 'text-zinc-200'}`}
+          className={`text-xl md:text-2xl transition-colors ${s <= (hover || value) ? 'text-amber-400' : 'text-zinc-200'}`}
         >
           ★
         </button>
@@ -233,16 +233,16 @@ export default function NovelPage() {
 
         {/* Novel header */}
         <div className="flex gap-8 mb-12">
-          <div className="flex-shrink-0 w-36 h-52 bg-zinc-200 rounded-lg overflow-hidden shadow-md">
+          <div className="flex-shrink-0 w-28 md:w-36 h-40 md:h-52 bg-zinc-200 rounded-lg overflow-hidden shadow-md">
             {novel.cover_image_url ? (
               <img src={novel.cover_image_url} alt={novel.title} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-4xl text-zinc-300">📖</div>
+              <div className="w-full h-full flex items-center justify-center text-xl md:text-2xl md:text-4xl text-zinc-300">📖</div>
             )}
           </div>
 
           <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-1">{novel.title}</h1>
+            <h1 className="text-xl md:text-2xl md:text-3xl font-bold mb-1">{novel.title}</h1>
             <p className="text-sm text-zinc-400 mb-3">
               by <span className="text-zinc-600 font-medium">{novel.author_username}</span>
             </p>

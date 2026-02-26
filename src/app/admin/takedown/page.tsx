@@ -142,20 +142,20 @@ export default function AdminTakedown() {
   return (
     <div className="min-h-screen bg-zinc-50 font-sans text-zinc-900 pb-20">
       <Navbar />
-      <div className="bg-white border-b border-zinc-100 px-8 py-3 flex items-center gap-3 text-sm">
+      <div className="bg-white border-b border-zinc-100 px-4 md:px-4 md:px-8 py-3 flex flex-wrap items-center gap-3 text-sm">
         <Link href="/admin/featured" className="text-zinc-400 hover:text-black transition-colors">← Admin</Link>
         <span className="text-zinc-200">|</span>
         <span className="font-medium text-zinc-700">🚫 Content Moderation</span>
         <span className="ml-auto text-xs text-zinc-400">{novels.length} total novels</span>
       </div>
 
-      <main className="max-w-5xl mx-auto mt-10 px-8">
-        <div className="flex items-end justify-between mb-6">
+      <main className="max-w-5xl mx-auto mt-6 md:mt-10 px-4 md:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-semibold mb-1">Content Moderation</h1>
+            <h1 className="text-xl md:text-xl md:text-2xl font-semibold mb-1">Content Moderation</h1>
             <p className="text-sm text-zinc-400">Take down novels that violate content policies. Authors are notified automatically.</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {(['all', 'active', 'taken_down'] as const).map((f) => (
               <button
                 key={f}
@@ -179,8 +179,8 @@ export default function AdminTakedown() {
         />
 
         {filtered.length === 0 ? (
-          <div className="text-center py-16">
-            <p className="text-zinc-300 text-4xl mb-3">📚</p>
+          <div className="text-center py-10 md:py-16">
+            <p className="text-zinc-300 text-xl md:text-2xl md:text-4xl mb-3">📚</p>
             <p className="text-zinc-400 text-sm">No novels found.</p>
           </div>
         ) : (
@@ -190,7 +190,7 @@ export default function AdminTakedown() {
                 key={novel.id}
                 className={`bg-white border rounded-xl p-5 ${novel.is_taken_down ? 'border-red-200 bg-red-50/30' : 'border-zinc-200'}`}
               >
-                <div className="flex gap-4 items-start">
+                <div className="flex flex-col sm:flex-row gap-4 items-start">
                   <div className="w-12 h-16 bg-zinc-100 rounded-lg overflow-hidden shrink-0">
                     {novel.cover_image_url
                       ? <img src={novel.cover_image_url} alt="" className="w-full h-full object-cover" />
