@@ -13,6 +13,21 @@ export default function Home() {
   useEffect(() => { document.title = 'Novel Reader — Write. Publish. Connect.' }, [])
   const [isLoggedIn, setIsLoggedIn] = useState(false)
 
+  const TAGLINES = [
+    'A minimalist platform for authors to write their stories and readers to discover their next favorite world.',
+    'We handle copyright issues seriously; if you suspect that your novels has been pirated on this website, feel free to contact us.',
+    "At Novel Reader, we do not provide third-party advertising. Any ads that you see are for novels and can be disabled in the settings. Isn't that nice?",
+    'Have any suggestions for this website? Feel free to reach out and suggest anything!',
+    '"In my personal opinion, we have the best payout rates and we do not own the copyright for your novels. That makes us stand out." - Founder of Novel Reader.',
+  	'Did you know that there are 8 unique descriptions for this page? Try to find them all!',
+  	"A simple website designed for the reader's convenience and the writer's benefit. No tricky clauses, no hidden messages.",
+  	'A lot of time and care was placed on this website. Please feel free to explore all its functions and capabilities!',
+  ]
+  const [tagline, setTagline] = useState('')
+  useEffect(() => {
+    setTagline(TAGLINES[Math.floor(Math.random() * TAGLINES.length)])
+  }, [])
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) setIsLoggedIn(true)
@@ -27,7 +42,7 @@ export default function Home() {
           Write. Publish. <br /> Connect with readers.
         </h2>
         <p className="text-zinc-500 text-lg mb-10 max-w-xl mx-auto">
-          A minimalist space for authors to craft their stories and readers to discover their next favorite world.
+          {tagline}
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
           <Link
