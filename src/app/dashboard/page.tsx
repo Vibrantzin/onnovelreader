@@ -18,6 +18,7 @@ export default function Dashboard() {
   const [accountStatus, setAccountStatus] = useState('active')
   const [statusReason, setStatusReason] = useState('')
   const [userAge, setUserAge] = useState<number | null>(null)
+  const [suspensionExpiry, setSuspensionExpiry] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [title, setTitle] = useState('')
   const [synopsis, setSynopsis] = useState('')
@@ -27,6 +28,27 @@ export default function Dashboard() {
   useEffect(() => {
     checkUserAndFetchNovels()
   }, [])
+
+  // Precise timer: fires at the exact moment a timed suspension expires
+  useEffect(() => {
+    if (!suspensionExpiry) return
+    const msUntilExpiry = new Date(suspensionExpiry).getTime() - Date.now()
+    if (msUntilExpiry <= 0) return
+    const timer = setTimeout(async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+      await supabase.from('users').update({
+        account_status: 'active',
+        status_reason: null,
+        status_expires_at: null,
+        status_updated_at: new Date().toISOString(),
+      }).eq('id', session.user.id)
+      setAccountStatus('active')
+      setStatusReason('')
+      setSuspensionExpiry(null)
+    }, msUntilExpiry)
+    return () => clearTimeout(timer)
+  }, [suspensionExpiry])
 
   const checkUserAndFetchNovels = async () => {
     try {
@@ -55,14 +77,20 @@ export default function Dashboard() {
         let status = userData.account_status || 'active'
 
         // Auto-lift expired suspensions
-        if (status === 'suspended' && userData.status_expires_at && new Date(userData.status_expires_at) <= new Date()) {
-          await supabase.from('users').update({
-            account_status: 'active',
-            status_reason: null,
-            status_expires_at: null,
-            status_updated_at: new Date().toISOString(),
-          }).eq('id', session.user.id)
-          status = 'active'
+        if (status === 'suspended' && userData.status_expires_at) {
+          if (new Date(userData.status_expires_at) <= new Date()) {
+            // Already expired — lift immediately
+            await supabase.from('users').update({
+              account_status: 'active',
+              status_reason: null,
+              status_expires_at: null,
+              status_updated_at: new Date().toISOString(),
+            }).eq('id', session.user.id)
+            status = 'active'
+          } else {
+            // Not yet expired — store expiry so timer can fire at exact moment
+            setSuspensionExpiry(userData.status_expires_at)
+          }
         }
 
         setAccountStatus(status)

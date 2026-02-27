@@ -79,10 +79,10 @@ export default function AdminAccounts() {
 
     let expiresAt: string | null = null
     if (duration && action === 'suspended') {
-      const days = parseInt(duration)
+      const days = parseFloat(duration)
       if (!isNaN(days) && days > 0) {
         const exp = new Date()
-        exp.setDate(exp.getDate() + days)
+        exp.setTime(exp.getTime() + days * 24 * 60 * 60 * 1000)
         expiresAt = exp.toISOString()
       }
     }
@@ -268,7 +268,7 @@ export default function AdminAccounts() {
 
               {action === 'suspended' && (
                 <div className="mb-4">
-                  <label className="text-xs font-medium text-zinc-600 block mb-1">Duration (days, leave blank for indefinite)</label>
+                  <label className="text-xs font-medium text-zinc-600 block mb-1">Duration in days (decimals allowed, e.g. 0.5 = 12h — leave blank for indefinite)</label>
                   <input
                     type="number"
                     placeholder="e.g. 7"
