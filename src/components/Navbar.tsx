@@ -43,6 +43,7 @@ export default function Navbar() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showDropdown, setShowDropdown] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
   const pathname = usePathname()
   const router = useRouter()
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -53,14 +54,14 @@ export default function Navbar() {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsLoggedIn(!!session)
       setIsAdmin(session?.user?.id === ADMIN_USER_ID)
-      if (session) fetchNotifications(session.user.id)
+      if (session) { setUserId(session.user.id); fetchNotifications(session.user.id) }
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setIsLoggedIn(!!session)
       setIsAdmin(session?.user?.id === ADMIN_USER_ID)
-      if (session) fetchNotifications(session.user.id)
-      else setNotifications([])
+      if (session) { setUserId(session.user.id); fetchNotifications(session.user.id) }
+      else { setUserId(null); setNotifications([]) }
     })
 
     return () => subscription.unsubscribe()
@@ -123,16 +124,23 @@ export default function Navbar() {
   }
 
   const clearAll = async () => {
-    const ids = notifications.map((n) => n.id)
-    if (ids.length === 0) return
-    await supabase.from('notifications').delete().in('id', ids)
-    setNotifications([])
+    if (!userId || notifications.length === 0) return
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('user_id', userId)
+    if (!error) setNotifications([])
   }
 
   const clearOne = async (e: React.MouseEvent, id: string) => {
     e.stopPropagation()
-    await supabase.from('notifications').delete().eq('id', id)
-    setNotifications((prev) => prev.filter((n) => n.id !== id))
+    if (!userId) return
+    const { error } = await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', id)
+      .eq('user_id', userId)
+    if (!error) setNotifications((prev) => prev.filter((n) => n.id !== id))
   }
 
   const handleNotifClick = (notif: Notification) => {

@@ -52,7 +52,19 @@ export default function Dashboard() {
 
       // Handle account status
       if (userData) {
-        const status = userData.account_status || 'active'
+        let status = userData.account_status || 'active'
+
+        // Auto-lift expired suspensions
+        if (status === 'suspended' && userData.status_expires_at && new Date(userData.status_expires_at) <= new Date()) {
+          await supabase.from('users').update({
+            account_status: 'active',
+            status_reason: null,
+            status_expires_at: null,
+            status_updated_at: new Date().toISOString(),
+          }).eq('id', session.user.id)
+          status = 'active'
+        }
+
         setAccountStatus(status)
         setStatusReason(userData.status_reason || '')
         if (userData.date_of_birth) {

@@ -39,6 +39,11 @@ export default function NovelDetail() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([])
   const [showGenrePicker, setShowGenrePicker] = useState(false)
   const [savingGenres, setSavingGenres] = useState(false)
+  const [tags, setTags] = useState<string[]>([])
+  const [tagInput, setTagInput] = useState('')
+  const [showTagEditor, setShowTagEditor] = useState(false)
+  const [savingTags, setSavingTags] = useState(false)
+  const [tagError, setTagError] = useState('')
   const [ageRating, setAgeRating] = useState('everyone')
   const [savingRating, setSavingRating] = useState(false)
   const [userAge, setUserAge] = useState<number | null>(null)
@@ -87,6 +92,7 @@ export default function NovelDetail() {
 
     setNovel(novelData)
     setSelectedGenres(novelData.genres || [])
+    setTags(novelData.tags || [])
     setAgeRating(novelData.age_rating || 'everyone')
 
     const { data: chaptersData } = await supabase
@@ -105,6 +111,39 @@ export default function NovelDetail() {
       if (prev.length >= 3) return prev // max 3
       return [...prev, genre]
     })
+  }
+
+  const handleAddTag = () => {
+    const trimmed = tagInput.trim().toLowerCase().replace(/[^a-z0-9 _-]/g, '')
+    if (!trimmed) return
+    if (trimmed.length > 30) { setTagError('Tags must be 30 characters or fewer.'); return }
+    if (tags.length >= 50) { setTagError('You can add up to 50 tags.'); return }
+    if (tags.includes(trimmed)) { setTagError('That tag already exists.'); return }
+    setTagError('')
+    setTags((prev) => [...prev, trimmed])
+    setTagInput('')
+  }
+
+  const handleRemoveTag = (tag: string) => {
+    setTags((prev) => prev.filter((t) => t !== tag))
+  }
+
+  const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') { e.preventDefault(); handleAddTag() }
+    if (e.key === 'Backspace' && tagInput === '' && tags.length > 0) {
+      setTags((prev) => prev.slice(0, -1))
+    }
+  }
+
+  const handleSaveTags = async () => {
+    setSavingTags(true)
+    const { error } = await supabase
+      .from('novels')
+      .update({ tags })
+      .eq('id', novelId)
+    if (error) setTagError('Failed to save tags.')
+    else { setNovel((n: any) => ({ ...n, tags })); setShowTagEditor(false) }
+    setSavingTags(false)
   }
 
   const handleSaveGenres = async () => {
@@ -392,6 +431,71 @@ export default function NovelDetail() {
                 ⚠️ Some ratings are unavailable — you must be the required age to publish content at that rating.
               </p>
             )}
+
+            {/* Tags section */}
+            <div className="mt-4">
+              <div className="flex items-center gap-2 mb-1.5">
+                <span className="text-xs text-zinc-400 font-medium">Tags:</span>
+                {tags.length === 0 && !showTagEditor && (
+                  <span className="text-xs text-zinc-400">No tags set.</span>
+                )}
+                {tags.slice(0, showTagEditor ? 0 : tags.length).map((tag) => (
+                  <span key={tag} className="text-xs bg-zinc-100 text-zinc-500 px-2 py-0.5 rounded-full">#{tag}</span>
+                ))}
+                <button
+                  onClick={() => { setShowTagEditor(!showTagEditor); setTagError('') }}
+                  className="text-xs font-medium text-zinc-400 hover:text-zinc-800 border border-dashed border-zinc-300 hover:border-zinc-500 px-2.5 py-1 rounded-full transition-colors"
+                >
+                  {showTagEditor ? 'Cancel' : '✎ Edit Tags'}
+                </button>
+              </div>
+
+              {showTagEditor && (
+                <div className="mt-2 bg-white border border-zinc-200 rounded-xl p-4 max-w-xl">
+                  <p className="text-xs text-zinc-400 mb-2">
+                    Up to 50 tags, 30 characters each. Press Enter to add.{' '}
+                    <span className="font-medium text-zinc-600">{tags.length}/50</span>
+                  </p>
+                  {/* Tag chips */}
+                  <div className="flex flex-wrap gap-1.5 mb-3">
+                    {tags.map((tag) => (
+                      <span key={tag} className="flex items-center gap-1 text-xs bg-zinc-100 text-zinc-700 px-2.5 py-1 rounded-full">
+                        #{tag}
+                        <button onClick={() => handleRemoveTag(tag)} className="text-zinc-400 hover:text-zinc-700 leading-none">✕</button>
+                      </span>
+                    ))}
+                  </div>
+                  {/* Input */}
+                  {tags.length < 50 && (
+                    <div className="flex gap-2 mb-3">
+                      <input
+                        type="text"
+                        value={tagInput}
+                        onChange={(e) => { setTagInput(e.target.value.slice(0, 30)); setTagError('') }}
+                        onKeyDown={handleTagKeyDown}
+                        placeholder="Add a tag..."
+                        maxLength={30}
+                        className="flex-1 text-xs border border-zinc-200 rounded-lg px-3 py-2 focus:outline-none focus:border-zinc-400"
+                      />
+                      <button
+                        onClick={handleAddTag}
+                        className="text-xs font-medium bg-zinc-100 hover:bg-zinc-200 text-zinc-700 px-3 py-2 rounded-lg transition-colors"
+                      >
+                        Add
+                      </button>
+                    </div>
+                  )}
+                  {tagError && <p className="text-xs text-red-500 mb-2">{tagError}</p>}
+                  <button
+                    onClick={handleSaveTags}
+                    disabled={savingTags}
+                    className="bg-zinc-900 text-white px-5 py-2 rounded-full text-xs font-semibold hover:bg-zinc-700 disabled:opacity-50 transition-colors"
+                  >
+                    {savingTags ? 'Saving...' : 'Save Tags'}
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Genre picker panel */}
             {showGenrePicker && (

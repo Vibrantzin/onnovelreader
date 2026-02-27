@@ -171,11 +171,53 @@ export default function Browse() {
 
   const publishedNovels = allNovels.filter((n) => n.view_count >= 0)
 
-  const filteredNovels = publishedNovels.filter((n) => {
-    const matchesGenre = selectedGenre ? (n.genres || []).includes(selectedGenre) : true
-    const matchesSearch = search ? n.title.toLowerCase().includes(search.toLowerCase()) : true
-    return matchesGenre && matchesSearch
-  })
+  const filteredNovels = (() => {
+    const q = search.toLowerCase().trim()
+    if (!q) return publishedNovels.filter((n: any) =>
+      selectedGenre ? (n.genres || []).includes(selectedGenre) : true
+    )
+
+    // Tag searches only activate for queries 3+ chars to prevent
+    // single-letter spam surfacing unrelated novels
+    const tagSearchEnabled = q.length >= 3
+
+    const scored = publishedNovels
+      .map((n: any) => {
+        const matchesGenre = selectedGenre ? (n.genres || []).includes(selectedGenre) : true
+        if (!matchesGenre) return null
+
+        const title = (n.title || '').toLowerCase()
+        const tags: string[] = (n.tags || []).map((t: string) => t.toLowerCase())
+
+        // Title scoring (always active)
+        const titleScore = (() => {
+          if (title === q) return 0                                         // exact title
+          if (title.startsWith(q)) return 1                                // title starts with query
+          const safe = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+          if (new RegExp('\\b' + safe + '\\b').test(title)) return 2            // whole word in title
+          if (title.includes(q)) return 5                                  // substring in title
+          return Infinity
+        })()
+
+        // Tag scoring (only if query is 3+ chars)
+        const tagScore = (() => {
+          if (!tagSearchEnabled) return Infinity
+          if (tags.some((t) => t === q)) return 3                          // exact tag match
+          if (tags.some((t) => t.startsWith(q))) return 3.5               // tag starts with query
+          if (tags.some((t) => t.includes(q))) return 4                   // tag contains query
+          return Infinity
+        })()
+
+        const best = Math.min(titleScore, tagScore)
+        if (best === Infinity) return null
+        return { novel: n, score: best }
+      })
+      .filter(Boolean) as { novel: any, score: number }[]
+
+    return scored
+      .sort((a, b) => a.score - b.score)
+      .map((s) => s.novel)
+  })()
 
   const readersPick = [...publishedNovels].sort((a, b) => b.view_count - a.view_count)
   const topNovels = [...publishedNovels].sort((a, b) => scoreNovel(b) - scoreNovel(a))
